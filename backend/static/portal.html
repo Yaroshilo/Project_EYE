@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>мойКонсьерж — Веб-портал Управляющей Организации (г. Якутск)</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/static/brand.css">
+</head>
+<body class="min-h-screen bg-[#F0EBE1] text-[#2C1F18] flex antialiased font-sans">
+
+  <!-- УВЕДОМЛЕНИЕ ДИСПЕТЧЕРА (TOAST) -->
+  <div id="portalToast" class="fixed top-4 right-4 z-50 bg-[#2C1F18] text-white px-5 py-3 rounded-2xl shadow-2xl border border-white/10 hidden transition-all duration-300">
+    <div class="flex items-center gap-3">
+      <span class="w-2 h-2 rounded-full bg-[#E57F5E]"></span>
+      <span id="portalToastText" class="text-xs font-semibold">Уведомление</span>
+      <button onclick="hidePortalToast()" class="text-gray-400 hover:text-white text-xs ml-2">✕</button>
+    </div>
+  </div>
+
+  <!-- БОКОВОЕ МЕНЮ (SIDEBAR) -->
+  <aside class="w-72 bg-[#4A2511] text-white flex flex-col justify-between p-6 shrink-0 shadow-2xl border-r border-black/10">
+    <div class="space-y-6">
+      
+      <!-- Логотип системы -->
+      <div class="flex items-center gap-3 pb-5 border-b border-white/10">
+        <div class="w-11 h-11 rounded-2xl bg-[#E57F5E] flex items-center justify-center font-black text-xl shadow-md">
+          К
+        </div>
+        <div>
+          <div class="font-extrabold text-base leading-tight tracking-tight">мойКонсьерж</div>
+          <div class="text-[10px] text-[#E8DED0] font-semibold tracking-wider uppercase">АСУ Диспетчерская • Якутск</div>
+        </div>
+      </div>
+
+      <!-- Карточка обслуживаемого МКД -->
+      <div class="bg-black/20 p-3.5 rounded-2xl border border-white/10 space-y-1">
+        <div class="text-[9px] text-[#E8DED0] uppercase font-bold tracking-wider">Обслуживаемый объект:</div>
+        <div class="font-black text-xs text-white">г. Якутск, пр. Ленина, 15</div>
+        <div class="text-[10px] text-[#E8DED0]/80">100 квартир • 4 подъезда • ОДС-04</div>
+      </div>
+
+      <!-- Навигация по разделам ТЗ (3.2) -->
+      <nav class="space-y-1.5 text-xs font-bold">
+        <button onclick="selectPortalTab('wall')" id="nav-wall" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl bg-white/15 text-white transition">
+          <svg class="w-4 h-4 text-[#E57F5E]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+          Видеостена постов (FR-1)
+        </button>
+
+        <button onclick="selectPortalTab('rbc')" id="nav-rbc" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-white/70 hover:bg-white/10 transition">
+          <svg class="w-4 h-4 text-[#E57F5E]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+          Биллинг МКУ «РБЦ» (FR-6)
+        </button>
+
+        <button onclick="selectPortalTab('tickets')" id="nav-tickets" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-white/70 hover:bg-white/10 transition">
+          <svg class="w-4 h-4 text-[#E57F5E]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+          Журнал заявок (FR-12)
+        </button>
+
+        <button onclick="selectPortalTab('hardware')" id="nav-hardware" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-white/70 hover:bg-white/10 transition">
+          <svg class="w-4 h-4 text-[#E57F5E]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          Оборудование (FR-5)
+        </button>
+
+        <button onclick="selectPortalTab('security')" id="nav-security" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-white/70 hover:bg-white/10 transition">
+          <svg class="w-4 h-4 text-[#E57F5E]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+          Доступ и 152-ФЗ (FR-7)
+        </button>
+      </nav>
+    </div>
+
+    <!-- Футер сайдбара -->
+    <div class="pt-5 border-t border-white/10 space-y-2">
+      <a href="/" target="_blank" class="w-full py-2.5 bg-[#E57F5E] hover:bg-[#D96D4B] rounded-xl text-xs font-black flex items-center justify-center gap-2 shadow transition">
+        <span>Открыть клиент жильца</span>
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+      </a>
+      <div class="text-[10px] text-center text-white/50">Редакция 2.0 • ГО «г. Якутск»</div>
+    </div>
+  </aside>
+
+  <!-- ОСНОВНАЯ ОБЛАСТЬ (MAIN WORKSPACE) -->
+  <div class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+
+    <!-- ВЕРХНЯЯ СЛУЖЕБНАЯ ПАНЕЛЬ -->
+    <header class="bg-white/95 backdrop-blur-md border-b border-[#E2D7C8] px-8 py-3.5 flex justify-between items-center sticky top-0 z-30">
+      <div class="flex items-center gap-4">
+        <span class="text-xs text-[#7A6E63] font-bold">Диспетчерский пункт:</span>
+        <span class="text-xs font-black text-[#4A2511]">УК «Центральная» • Дежурный инженер</span>
+        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-xs"></span>
+      </div>
+
+      <div class="flex items-center gap-4 text-xs font-semibold">
+        <div class="flex items-center gap-2 bg-[#F1E8D8] px-3.5 py-1.5 rounded-full text-[#4A2511] border border-[#E2D7C8]">
+          <svg class="w-3.5 h-3.5 text-sky-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707"/></svg>
+          <span>-38°C • Термообогрев оборудования активен</span>
+        </div>
+        <span id="portalCamerasSummaryText" class="text-emerald-800 font-extrabold flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          2 онлайн • 2 оффлайн
+        </span>
+      </div>
+    </header>
+
+    <!-- КОНТЕНТНАЯ ЧАСТЬ ВЕБ-ПОРТАЛА -->
+    <main class="p-8 space-y-6">
+
+      <!-- ================= РАЗДЕЛ 1: ВИДЕОСТЕНА ОХРАНЫ (FR-1, FR-5) ================= -->
+      <section id="pane-wall" class="space-y-5">
+        
+        <!-- Сводные финансовые показатели дома (100 квартир) по ТЗ -->
+        <div class="grid grid-cols-4 gap-4">
+          <div class="p-4 bg-white rounded-2xl border border-[#E2D7C8] shadow-sm">
+            <span class="text-[10px] text-[#7A6E63] font-bold uppercase tracking-wider block">Жилой фонд:</span>
+            <span class="text-2xl font-black text-[#4A2511]">100 квартир</span>
+            <span class="text-[11px] text-emerald-700 font-semibold block mt-1">Охват периметра 100%</span>
+          </div>
+
+          <div class="p-4 bg-white rounded-2xl border border-[#E2D7C8] shadow-sm">
+            <span class="text-[10px] text-[#7A6E63] font-bold uppercase tracking-wider block">Базовый сбор МКД:</span>
+            <span class="text-2xl font-black text-[#4A2511]">30 000.00 ₽</span>
+            <span class="text-[11px] text-[#7A6E63] block mt-1">300.00 ₽/мес с лицевого счета</span>
+          </div>
+
+          <div class="p-4 bg-white rounded-2xl border border-[#E2D7C8] shadow-sm">
+            <span class="text-[10px] text-[#7A6E63] font-bold uppercase tracking-wider block">Доп. архив и аналитика:</span>
+            <span class="text-2xl font-black text-[#E57F5E]">9 000.00 ₽</span>
+            <span class="text-[11px] text-emerald-700 font-semibold block mt-1">+90.00 ₽/мес с квартиры</span>
+          </div>
+
+          <div class="p-4 bg-white rounded-2xl border border-[#E2D7C8] shadow-sm">
+            <span class="text-[10px] text-[#7A6E63] font-bold uppercase tracking-wider block">Сверка с МКУ «РБЦ»:</span>
+            <span class="text-2xl font-black text-emerald-700">96.8%</span>
+            <span class="text-[11px] text-[#7A6E63] block mt-1">Реестр начислений 10-2026 закрыт</span>
+          </div>
+        </div>
+
+        <!-- Видеостена 4 камер -->
+        <div class="mk-card space-y-3.5">
+          <div class="flex justify-between items-center">
+            <div>
+              <h2 class="text-sm font-extrabold text-[#4A2511]">Видеостена постов наблюдения (4 камеры МКД)</h2>
+              <p class="text-xs text-[#7A6E63]">Многопоточный WebRTC P2P мониторинг входных групп и лифтов</p>
+            </div>
+            <button onclick="initStreams()" class="px-3.5 py-1.5 bg-[#F1E8D8] text-[#4A2511] rounded-xl text-xs font-bold hover:bg-[#E2D7C8] transition">
+              Перезапустить потоки
+            </button>
+          </div>
+
+          <div class="grid grid-cols-4 gap-3.5">
+            <!-- Камера 1 (Live) -->
+            <div class="relative aspect-video rounded-xl overflow-hidden bg-black border border-white/20 shadow">
+              <iframe id="wallStream1" class="w-full h-full border-0 object-cover" allow="autoplay"></iframe>
+              <span class="absolute top-2 left-2 bg-black/80 text-[9px] text-white font-bold px-2 py-0.5 rounded flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 bg-red-500 rounded-full animate-ping"></span> Двор (Live)
+              </span>
+              <span class="absolute bottom-1 right-2 text-[9px] text-white/80 font-mono">1080p • 25 FPS</span>
+            </div>
+
+            <!-- Камера 2 (Live) -->
+            <div class="relative aspect-video rounded-xl overflow-hidden bg-black border border-white/20 shadow">
+              <iframe id="wallStream2" class="w-full h-full border-0 object-cover" allow="autoplay"></iframe>
+              <span class="absolute top-2 left-2 bg-black/80 text-[9px] text-white font-bold px-2 py-0.5 rounded flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span> Подъезд 1 (Live)
+              </span>
+              <span class="absolute bottom-1 right-2 text-[9px] text-white/80 font-mono">1080p • 25 FPS</span>
+            </div>
+
+            <!-- Камера 3 (Оффлайн) -->
+            <div class="relative aspect-video rounded-xl overflow-hidden bg-[#2D1B1A] border border-red-500/30 flex flex-col items-center justify-center p-3 text-center">
+              <span class="text-xs text-red-200 font-extrabold">Парковка (ОФФЛАЙН)</span>
+              <span class="text-[10px] text-red-300/80 mt-1">Обрыв кабельной линии на опоре</span>
+              <span class="mt-2 text-[9px] bg-red-950/80 text-red-200 px-2 py-0.5 rounded font-mono">0 FPS • Сигнал потерян</span>
+            </div>
+
+            <!-- Камера 4 (Оффлайн) -->
+            <div class="relative aspect-video rounded-xl overflow-hidden bg-[#2D1B1A] border border-red-500/30 flex flex-col items-center justify-center p-3 text-center">
+              <span class="text-xs text-red-200 font-extrabold">Лифт (ОФФЛАЙН)</span>
+              <span class="text-[10px] text-red-300/80 mt-1">Обледенение контактов (-42°C)</span>
+              <span class="mt-2 text-[9px] bg-red-950/80 text-red-200 px-2 py-0.5 rounded font-mono">0 FPS • Сигнал потерян</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= РАЗДЕЛ 2: БИЛЛИНГ И МКУ «РБЦ» (FR-6, FR-11) ================= -->
+      <section id="pane-rbc" class="space-y-5 hidden">
+        <div class="mk-card space-y-4">
+          <div class="flex justify-between items-center pb-3 border-b border-[#E2D7C8]">
+            <div>
+              <h2 class="text-base font-extrabold text-[#4A2511]">Интеграционный шлюз с МКУ «РБЦ» (г. Якутск)</h2>
+              <p class="text-xs text-[#7A6E63]">Официальные реквизиты: г. Якутск, пр. Ленина, 15А • mkurbc15@mail.ru</p>
+            </div>
+            
+            <div class="flex gap-2.5">
+              <a href="/api/v1/rbc/export-charges" target="_blank" class="px-4 py-2.5 bg-[#4A2511] hover:bg-[#68371C] text-white rounded-xl text-xs font-bold shadow flex items-center gap-2 transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                Выгрузка реестра начислений (.CSV)
+              </a>
+
+              <input type="file" id="bankCsvInput" class="hidden" accept=".csv" onchange="uploadBankStatement(this)">
+              <button onclick="document.getElementById('bankCsvInput').click()" class="px-4 py-2.5 bg-[#E57F5E] hover:bg-[#D96D4B] text-white rounded-xl text-xs font-bold shadow flex items-center gap-2 transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                Загрузить выписку банка (Сверка)
+              </button>
+            </div>
+          </div>
+
+          <!-- Таблица начислений по 100 квартирам МКД -->
+          <div class="border border-[#E2D7C8] rounded-2xl overflow-hidden shadow-xs">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-[#F1E8D8] text-[#4A2511] font-black text-[11px] uppercase tracking-wider">
+                <tr>
+                  <th class="p-3.5">Лицевой счет РБЦ</th>
+                  <th class="p-3.5">Адрес МКД</th>
+                  <th class="p-3.5">Кв.</th>
+                  <th class="p-3.5">Базовый тариф</th>
+                  <th class="p-3.5">Расширенный архив</th>
+                  <th class="p-3.5">Итого к начислению</th>
+                  <th class="p-3.5">Период</th>
+                  <th class="p-3.5">Статус оплат</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-[#E2D7C8] bg-white">
+                <tr>
+                  <td class="p-3.5 font-mono font-bold text-[#89542B]">РБЦ-ЯКТ-1042</td>
+                  <td class="p-3.5">г. Якутск, пр. Ленина, 15</td>
+                  <td class="p-3.5 font-bold">42</td>
+                  <td class="p-3.5">300.00 ₽</td>
+                  <td class="p-3.5 font-semibold text-[#E57F5E]">+90.00 ₽</td>
+                  <td class="p-3.5 font-black text-[#4A2511]">390.00 ₽</td>
+                  <td class="p-3.5 font-mono">10-2026</td>
+                  <td class="p-3.5"><span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">Оплачено (СБП)</span></td>
+                </tr>
+                <tr>
+                  <td class="p-3.5 font-mono font-bold text-[#89542B]">РБЦ-ЯКТ-1043</td>
+                  <td class="p-3.5">г. Якутск, пр. Ленина, 15</td>
+                  <td class="p-3.5 font-bold">43</td>
+                  <td class="p-3.5">300.00 ₽</td>
+                  <td class="p-3.5 text-[#7A6E63]">—</td>
+                  <td class="p-3.5 font-black text-[#4A2511]">300.00 ₽</td>
+                  <td class="p-3.5 font-mono">10-2026</td>
+                  <td class="p-3.5"><span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">Выставлен счет (ЕПД)</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= РАЗДЕЛ 3: ДИСПЕТЧЕРСКАЯ ЗАЯВОК (FR-12) ================= -->
+      <section id="pane-tickets" class="space-y-5 hidden">
+        <div class="mk-card space-y-4">
+          <div class="flex justify-between items-center pb-3 border-b border-[#E2D7C8]">
+            <div>
+              <h2 class="text-base font-extrabold text-[#4A2511]">Журнал аварийно-диспетчерской службы</h2>
+              <p class="text-xs text-[#7A6E63]">Контроль сроков ремонта оборудования, фиксация фото и обратная связь жителей</p>
+            </div>
+            <button onclick="loadPortalTickets()" class="px-3.5 py-1.5 bg-[#F1E8D8] text-[#4A2511] rounded-xl text-xs font-bold hover:bg-[#E2D7C8] transition">
+              Обновить реестр заявок
+            </button>
+          </div>
+
+          <div class="border border-[#E2D7C8] rounded-2xl overflow-hidden shadow-xs">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-[#F1E8D8] text-[#4A2511] font-black text-[11px] uppercase tracking-wider">
+                <tr>
+                  <th class="p-3.5">ID</th>
+                  <th class="p-3.5">Устройство</th>
+                  <th class="p-3.5">Суть инцидента</th>
+                  <th class="p-3.5">Снимок сбоя</th>
+                  <th class="p-3.5">Статус наряда</th>
+                  <th class="p-3.5">Оценка жильца</th>
+                  <th class="p-3.5">Управление</th>
+                </tr>
+              </thead>
+              <tbody id="portalTicketsTbody" class="divide-y divide-[#E2D7C8] bg-white">
+                <!-- Заполняется JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= РАЗДЕЛ 4: ОБОРУДОВАНИЕ (FR-5) ================= -->
+      <section id="pane-hardware" class="space-y-5 hidden">
+        <div class="grid grid-cols-3 gap-6">
+          
+          <!-- Регистрация устройства -->
+          <div class="mk-card space-y-3.5">
+            <div>
+              <h3 class="text-xs font-extrabold text-[#4A2511]">Регистрация нового устройства (FR-5)</h3>
+              <p class="text-[11px] text-[#7A6E63]">Добавление камеры по RTSP/WebRTC в сеть МКД</p>
+            </div>
+
+            <div class="space-y-2.5 text-xs">
+              <div>
+                <label class="text-[10px] text-[#7A6E63] font-bold block mb-0.5">Название камеры:</label>
+                <input id="hwNameInput" type="text" value="Камера Шлагбаум" class="w-full text-xs">
+              </div>
+              <div>
+                <label class="text-[10px] text-[#7A6E63] font-bold block mb-0.5">Зона охвата:</label>
+                <input id="hwZoneInput" type="text" value="Въезд во двор (КПП)" class="w-full text-xs">
+              </div>
+              <div>
+                <label class="text-[10px] text-[#7A6E63] font-bold block mb-0.5">IP-адрес устройства:</label>
+                <input id="hwIpInput" type="text" value="192.168.1.105" class="w-full text-xs font-mono">
+              </div>
+              <button onclick="submitNewCameraHardware()" class="w-full py-2.5 mk-btn-chocolate text-xs shadow mt-1">
+                Зарегистрировать в сети
+              </button>
+            </div>
+          </div>
+
+          <!-- Реестр оборудования дома -->
+          <div class="mk-card col-span-2 space-y-3.5">
+            <h3 class="text-xs font-extrabold text-[#4A2511]">Спецификация и состояние оборудования (пр. Ленина, 15)</h3>
+            <div id="hwRegistryList" class="space-y-2 text-xs"></div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ================= РАЗДЕЛ 5: ДОСТУП И 152-ФЗ (FR-7) ================= -->
+      <section id="pane-security" class="space-y-5 hidden">
+        <div class="mk-card space-y-4">
+          <div class="flex justify-between items-center pb-3 border-b border-[#E2D7C8]">
+            <div>
+              <h2 class="text-base font-extrabold text-[#4A2511]">Журнал аудита доступа к видеоархиву (152-ФЗ)</h2>
+              <p class="text-xs text-[#7A6E63]">Фиксация фактов экспорта записей, передачи материалов МВД и работы операторов</p>
+            </div>
+            <button onclick="requestPoliceProtocolExport()" class="px-4 py-2 bg-[#E57F5E] hover:bg-[#D96D4B] text-white rounded-xl text-xs font-bold shadow transition flex items-center gap-1.5">
+              <span>Сформировать протокол выгрузки для МВД</span>
+            </button>
+          </div>
+
+          <div class="border border-[#E2D7C8] rounded-2xl overflow-hidden shadow-xs">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-[#F1E8D8] text-[#4A2511] font-black text-[11px] uppercase tracking-wider">
+                <tr>
+                  <th class="p-3.5">Дата и время</th>
+                  <th class="p-3.5">Оператор</th>
+                  <th class="p-3.5">Действие</th>
+                  <th class="p-3.5">Объект архива</th>
+                  <th class="p-3.5">Юридический статус</th>
+                </tr>
+              </thead>
+              <tbody id="securityAuditTbody" class="divide-y divide-[#E2D7C8] bg-white">
+                <!-- Заполняется JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- СКРИПТЫ ВЕБ-ПОРТАЛА -->
+  <script>
+    function showPortalToast(msg) {
+      const t = document.getElementById('portalToast');
+      document.getElementById('portalToastText').innerText = msg;
+      t.classList.remove('hidden');
+      setTimeout(() => { hidePortalToast(); }, 4000);
+    }
+    function hidePortalToast() {
+      document.getElementById('portalToast').classList.add('hidden');
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      initStreams();
+      fetchPortalCameras();
+      loadPortalTickets();
+      loadSecurityAudit();
+    });
+
+    function initStreams() {
+      const h = window.location.hostname || 'localhost';
+      document.getElementById('wallStream1').src = `http://${h}:1984/stream.html?src=phone_cam`;
+      document.getElementById('wallStream2').src = `http://${h}:1984/stream.html?src=cam2`;
+    }
+
+    function selectPortalTab(tabName) {
+      ['wall', 'rbc', 'tickets', 'hardware', 'security'].forEach(t => {
+        document.getElementById(`pane-${t}`).classList.add('hidden');
+        document.getElementById(`nav-${t}`).className = "w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-white/70 hover:bg-white/10 transition";
+      });
+      document.getElementById(`pane-${tabName}`).classList.remove('hidden');
+      document.getElementById(`nav-${tabName}`).className = "w-full flex items-center gap-3 px-3.5 py-3 rounded-xl bg-white/15 text-white transition";
+    }
+
+    async function fetchPortalCameras() {
+      try {
+        const res = await fetch('/api/v1/cameras');
+        const data = await res.json();
+        document.getElementById('portalCamerasSummaryText').innerText = `${data.summary.online} онлайн • ${data.summary.offline} оффлайн`;
+
+        const list = document.getElementById('hwRegistryList');
+        if (!list) return;
+        list.innerHTML = "";
+
+        data.cameras.forEach(c => {
+          const isOnline = c.status === "Online";
+          list.innerHTML += `
+            <div class="p-3 bg-[#FAF7F2] rounded-xl border border-[#E2D7C8] flex justify-between items-center">
+              <div>
+                <div class="font-bold text-[#4A2511]">${c.name} • ${c.zone}</div>
+                <div class="text-[10px] text-[#7A6E63] mt-0.5">${isOnline ? (c.resolution + ' • ' + c.stream_type) : c.error}</div>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-[10px] font-semibold text-[#7A6E63]">${c.heating ? 'Обогрев вкл' : 'Обогрев выкл'}</span>
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold ${isOnline ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'}">
+                  ${c.status}
+                </span>
+              </div>
+            </div>
+          `;
+        });
+      } catch (e) {}
+    }
+
+    async function loadPortalTickets() {
+      try {
+        const res = await fetch('/api/v1/tickets');
+        const tickets = await res.json();
+        const tbody = document.getElementById('portalTicketsTbody');
+        tbody.innerHTML = "";
+
+        tickets.forEach(t => {
+          const isNew = t.status === 'NEW';
+          tbody.innerHTML += `
+            <tr>
+              <td class="p-3.5 font-mono font-bold text-[#7A6E63]">#${t.id}</td>
+              <td class="p-3.5 font-bold text-[#4A2511]">${t.camera_name}</td>
+              <td class="p-3.5">${t.description}</td>
+              <td class="p-3.5">${t.photo_url ? `<a href="${t.photo_url}" target="_blank" class="text-[#E57F5E] underline font-bold">Снимок</a>` : '—'}</td>
+              <td class="p-3.5">
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold ${isNew ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'}">
+                  ${isNew ? 'Новая' : 'Закрыта'}
+                </span>
+              </td>
+              <td class="p-3.5 font-bold text-amber-600">${t.rating ? (t.rating + ' из 5') : '—'}</td>
+              <td class="p-3.5">
+                ${isNew 
+                  ? `<button onclick="closePortalTicket(${t.id})" class="px-3 py-1 mk-btn-coral text-[10px] font-bold">Закрыть наряд</button>` 
+                  : '<span class="text-emerald-700 font-bold">Выполнен</span>'}
+              </td>
+            </tr>
+          `;
+        });
+      } catch (e) {}
+    }
+
+    async function closePortalTicket(id) {
+      await fetch(`/api/v1/tickets/${id}/status?new_status=RESOLVED`, { method: 'PATCH' });
+      showPortalToast(`Наряд #${id} успешно закрыт`);
+      loadPortalTickets();
+    }
+
+    async function submitNewCameraHardware() {
+      const name = document.getElementById('hwNameInput').value.trim();
+      const zone = document.getElementById('hwZoneInput').value.trim();
+      const ip = document.getElementById('hwIpInput').value.trim();
+
+      if (!name || !ip) return showPortalToast("Заполните обязательные поля");
+
+      await fetch('/api/v1/cameras/register', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ name: name, zone: zone, ip_address: ip })
+      });
+      showPortalToast(`Камера "${name}" добавлена в спецификацию дома`);
+      fetchPortalCameras();
+    }
+
+    async function uploadBankStatement(input) {
+      if (!input.files[0]) return;
+      const fd = new FormData();
+      fd.append("file", input.files[0]);
+      const res = await fetch('/api/v1/rbc/import-payments', { method: 'POST', body: fd });
+      const d = await res.json();
+      showPortalToast(d.message);
+    }
+
+    async function loadSecurityAudit() {
+      try {
+        const res = await fetch('/api/v1/audit/logs');
+        const logs = await res.json();
+        const tbody = document.getElementById('securityAuditTbody');
+        tbody.innerHTML = "";
+        logs.forEach(l => {
+          tbody.innerHTML += `
+            <tr>
+              <td class="p-3.5 font-mono text-[#7A6E63]">${l.timestamp}</td>
+              <td class="p-3.5 font-bold text-[#4A2511]">${l.operator}</td>
+              <td class="p-3.5">${l.action}</td>
+              <td class="p-3.5 font-semibold">${l.target}</td>
+              <td class="p-3.5"><span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">${l.law_status}</span></td>
+            </tr>
+          `;
+        });
+      } catch (e) {}
+    }
+
+    async function requestPoliceProtocolExport() {
+      const res = await fetch('/api/v1/audit/export-protocol', { method: 'POST' });
+      const d = await res.json();
+      showPortalToast(`Сформирован официальный протокол: ${d.protocol_number}`);
+      loadSecurityAudit();
+    }
+  </script>
+</body>
+</html>

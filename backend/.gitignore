@@ -1,0 +1,12 @@
+ Python
+__pycache__/
+*.py[cod]
+
+# База данных
+*.db
+*.sqlite3
+
+# Видео и кэш кадров
+*.mp4
+*.avi
+static/archive/

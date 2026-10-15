@@ -1,0 +1,120 @@
+/* мойКонсьерж — оригинальный brand layer для МКД г. Якутска */
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --mk-coral: #E57F5E;
+  --mk-chocolate: #5B2F15;
+  --mk-cream: #F4ECDA;
+  --mk-olive: #9D9167;
+  --mk-brown: #89542B;
+  --mk-bg: #FBF8F1;
+  --mk-surface: #FFFFFF;
+  --mk-border: #E8DED0;
+  --mk-text: #33251D;
+  --mk-muted: #807468;
+  --mk-shadow: 0 8px 26px rgba(91, 47, 21, .08);
+}
+
+* { box-sizing: border-box; }
+
+html { 
+  background-color: var(--mk-bg); 
+}
+
+body {
+  color: var(--mk-text);
+  background-color: var(--mk-bg);
+  font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+button, input, textarea { 
+  font: inherit; 
+}
+
+button, a { 
+  -webkit-tap-highlight-color: transparent; 
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+button:active { 
+  transform: scale(0.98); 
+}
+
+/* Фирменные карточки */
+.mk-card {
+  background: var(--mk-surface);
+  border: 1px solid var(--mk-border);
+  border-radius: 22px;
+  box-shadow: var(--mk-shadow);
+  padding: 16px;
+}
+
+/* Заголовки */
+h2, h3 {
+  color: var(--mk-chocolate);
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  margin: 0;
+}
+
+/* Фирменная кнопка оплаты */
+.mk-btn-coral {
+  background-color: var(--mk-coral);
+  color: #FFFFFF;
+  border-radius: 14px;
+  box-shadow: 0 5px 14px rgba(229, 127, 94, 0.28);
+  font-weight: 800;
+}
+.mk-btn-coral:hover {
+  background-color: #D96D4B;
+}
+
+/* Шоколадная кнопка действий */
+.mk-btn-chocolate {
+  background-color: var(--mk-chocolate);
+  color: #FFFFFF;
+  border-radius: 14px;
+  font-weight: 700;
+}
+.mk-btn-chocolate:hover {
+  background-color: var(--mk-brown);
+}
+
+/* Инпуты */
+input[type="text"], textarea {
+  color: var(--mk-text);
+  background-color: #FFFEFC;
+  border: 1px solid var(--mk-border);
+  border-radius: 13px;
+  padding: 10px 14px;
+  outline: none;
+}
+input[type="text"]:focus, textarea:focus {
+  border-color: var(--mk-coral);
+  box-shadow: 0 0 0 3px rgba(229, 127, 94, 0.18);
+}
+
+/* Нижняя навигация */
+.mk-bottom-bar {
+  background: rgba(255, 255, 255, 0.96);
+  border-top: 1px solid var(--mk-border);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+/* Плеер камер */
+.mk-player-frame {
+  background: #24211E;
+  border: 1px solid var(--mk-border);
+  border-radius: 20px;
+}
+
+/* Модальное окно */
+.mk-modal-overlay {
+  background-color: rgba(51, 37, 29, 0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}

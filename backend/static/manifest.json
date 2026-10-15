@@ -1,0 +1,22 @@
+{
+  "name": "мойКонсьерж — МКД",
+  "short_name": "Консьерж",
+  "description": "Цифровой помощник жителя МКД (Якутск)",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FAF7F2",
+  "theme_color": "#5B2F15",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "https://img.icons8.com/color/192/intercom.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://img.icons8.com/color/512/intercom.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
